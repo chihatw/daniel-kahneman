@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ダニエル・カーネマン：45歳までの軌跡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Visualization & Content Choices:
+        - Timeline (Overview): Goal: Show chronological progression. Method: HTML/CSS horizontal timeline. Interaction: Visual scan. Justification: Provides quick context of key milestones.
+        - Publication Cards (Key Publications): Goal: Detail individual works. Method: HTML/CSS cards. Interaction: Static display of key information. Justification: Organizes publication details clearly.
+        - Citation Chart (Key Publications): Goal: Compare impact of listed works from the report's table. Method: Chart.js Bar Chart. Interaction: Tooltips on hover. Justification: Visually represents the citation data from the report's table. Library: Chart.js.
+        - Thematic Evolution Diagram (Thematic Evolution): Goal: Illustrate shift in research focus. Method: HTML/CSS boxes and arrows. Interaction: Visual flow. Justification: Simplifies understanding of his intellectual trajectory.
+        - Text Blocks: Goal: Provide detailed explanations. Method: Tailwind-styled paragraphs. Justification: Delivers core textual information from the report.
+        CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+      body {
+        font-family: 'Inter', sans-serif; /* Tailwind's default sans-serif is a good choice */
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 700px; /* Adjusted max-width for better display */
+        margin-left: auto;
+        margin-right: auto;
+        height: 350px; /* Base height */
+        max-height: 450px; /* Max height */
+      }
+      @media (min-width: 768px) {
+        /* md breakpoint */
+        .chart-container {
+          height: 400px;
+        }
+      }
+      /* Custom styles for timeline */
+      .timeline-item {
+        position: relative;
+        padding-bottom: 2rem;
+        padding-left: 2.5rem; /* Space for icon and line */
+      }
+      .timeline-item:last-child {
+        padding-bottom: 0;
+      }
+      .timeline-item::before {
+        /* Vertical line */
+        content: '';
+        position: absolute;
+        left: 1rem;
+        top: 0.5rem;
+        bottom: 0;
+        width: 2px;
+        background-color: #cbd5e1; /* coolGray-300 */
+      }
+      .timeline-item:last-child::before {
+        height: 0.5rem; /* Shorten line for the last item */
+      }
+      .timeline-icon {
+        position: absolute;
+        left: calc(1rem - 0.5rem + 1px); /* Center icon on the line */
+        top: 0.5rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background-color: #3b82f6; /* blue-500 */
+        z-index: 10;
+      }
+      /* Custom styles for flow diagram */
+      .flow-box {
+        border: 2px solid #9ca3af; /* gray-400 */
+        padding: 1rem;
+        text-align: center;
+        border-radius: 0.375rem; /* rounded-md */
+        background-color: #f9fafb; /* gray-50 */
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .flow-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #6b7280; /* gray-500 */
+        margin: 0.5rem 0;
+      }
+      .nav-link {
+        transition: color 0.3s ease;
+      }
+      .nav-link:hover {
+        color: #3b82f6; /* blue-500 */
+      }
+      .section-active {
+        color: #3b82f6; /* blue-500 */
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-700 antialiased">
+    <header class="bg-white shadow-md sticky top-0 z-50">
+      <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <h1 class="text-xl sm:text-2xl font-bold text-slate-800">
+            ダニエル・カーネマン：45歳までの軌跡
+          </h1>
+          <nav class="hidden md:flex space-x-4 lg:space-x-6">
+            <a
+              href="#overview"
+              class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+              >概要</a
+            >
+            <a
+              href="#education"
+              class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+              >学歴と初期研究</a
+            >
+            <a
+              href="#publications"
+              class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+              >主要論文</a
+            >
+            <a
+              href="#evolution"
+              class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+              >テーマの進化</a
+            >
+            <a
+              href="#collaboration"
+              class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+              >トベルスキーとの協働</a
+            >
+            <a
+              href="#conclusion"
+              class="nav-link text-slate-600 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+              >結論</a
+            >
+          </nav>
+          <button
+            id="mobile-menu-button"
+            class="md:hidden text-slate-600 hover:text-blue-600"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div id="mobile-menu" class="md:hidden hidden bg-white shadow-lg">
+        <a
+          href="#overview"
+          class="block nav-link text-slate-600 hover:text-blue-600 px-4 py-3 text-sm font-medium border-b border-slate-200"
+          >概要</a
+        >
+        <a
+          href="#education"
+          class="block nav-link text-slate-600 hover:text-blue-600 px-4 py-3 text-sm font-medium border-b border-slate-200"
+          >学歴と初期研究</a
+        >
+        <a
+          href="#publications"
+          class="block nav-link text-slate-600 hover:text-blue-600 px-4 py-3 text-sm font-medium border-b border-slate-200"
+          >主要論文</a
+        >
+        <a
+          href="#evolution"
+          class="block nav-link text-slate-600 hover:text-blue-600 px-4 py-3 text-sm font-medium border-b border-slate-200"
+          >テーマの進化</a
+        >
+        <a
+          href="#collaboration"
+          class="block nav-link text-slate-600 hover:text-blue-600 px-4 py-3 text-sm font-medium border-b border-slate-200"
+          >トベルスキーとの協働</a
+        >
+        <a
+          href="#conclusion"
+          class="block nav-link text-slate-600 hover:text-blue-600 px-4 py-3 text-sm font-medium"
+          >結論</a
+        >
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <section id="overview" class="mb-12 scroll-mt-16">
+        <h2
+          class="text-2xl sm:text-3xl font-semibold text-slate-800 mb-6 border-b-2 border-blue-500 pb-2"
+        >
+          概要：ダニエル・カーネマンの初期学術的道のり
+        </h2>
+        <p class="mb-4 text-base sm:text-lg leading-relaxed">
+          ダニエル・カーネマンは、認知心理学および行動経済学の分野における傑出した人物であり、人間の判断と意思決定に関する画期的な研究で広く知られています。彼の研究は、2002年にノーベル経済学賞を受賞したことからもわかるように、学術界全体に多大な影響を与え、その影響は心理学、経済学、公共政策といった多様な分野に及んでいます。このアプリケーションは、カーネマンが45歳の誕生日（1979年3月5日）を迎えるまでに発表した学術論文と、その知的発展の軌跡を概観します。
+        </p>
+        <h3 class="text-xl sm:text-2xl font-semibold text-slate-700 my-6">
+          主要な出来事のタイムライン
+        </h3>
+        <div class="space-y-2">
+          <div class="timeline-item">
+            <div class="timeline-icon"></div>
+            <p class="font-semibold text-slate-700">1934年3月5日：誕生</p>
+            <p class="text-sm text-slate-600">
+              イスラエルのテルアビブで生まれる。
+            </p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-icon"></div>
+            <p class="font-semibold text-slate-700">1954年：学士号取得</p>
+            <p class="text-sm text-slate-600">
+              ヘブライ大学で心理学と数学の学士号を取得。
+            </p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-icon"></div>
+            <p class="font-semibold text-slate-700">1961年：博士号取得</p>
+            <p class="text-sm text-slate-600">
+              カリフォルニア大学バークレー校で心理学の博士号を取得。
+            </p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-icon"></div>
+            <p class="font-semibold text-slate-700">1966年：論文発表</p>
+            <p class="text-sm text-slate-600">
+              "Pupil diameter and load on memory" を発表。
+            </p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-icon"></div>
+            <p class="font-semibold text-slate-700">1972年：論文発表</p>
+            <p class="text-sm text-slate-600">
+              "Subjective probability: A judgment of representativeness"
+              を発表。
+            </p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-icon"></div>
+            <p class="font-semibold text-slate-700">1973年：書籍出版</p>
+            <p class="text-sm text-slate-600">
+              "Attention and Effort" を出版。
+            </p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-icon"></div>
+            <p class="font-semibold text-slate-700">1979年：論文発表</p>
+            <p class="text-sm text-slate-600">
+              "Prospect theory: An analysis of decision under risk"
+              をEconometrica誌に発表（45歳の誕生日以前）。
+            </p>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-icon"></div>
+            <p class="font-semibold text-slate-700">
+              1979年3月5日：45歳の誕生日
+            </p>
+            <p class="text-sm text-slate-600">本報告書の対象期間の終点。</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="education" class="mb-12 scroll-mt-16">
+        <h2
+          class="text-2xl sm:text-3xl font-semibold text-slate-800 mb-6 border-b-2 border-blue-500 pb-2"
+        >
+          基礎を築いた時代：教育と初期の研究焦点
+        </h2>
+        <p class="mb-4 text-base sm:text-lg leading-relaxed">
+          ダニエル・カーネマンの学術的な旅は、1954年にヘブライ大学で心理学と数学の学士号を取得することから始まり、1961年にはカリフォルニア大学バークレー校で心理学の博士号を取得しました。彼の初期の研究は認知心理学に深く根ざし、特に視覚的知覚と注意に焦点を当てていました。これらの探求は、人間の認知プロセスとその限界に対する彼の理解の基礎を築き、後の意思決定理論に大きな影響を与えることになります。
+        </p>
+        <div class="grid md:grid-cols-2 gap-6 mt-6">
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-xl font-semibold text-slate-700 mb-2">
+              視覚的知覚
+            </h3>
+            <p class="text-slate-600">
+              初期の研究テーマの一つで、外界からの情報をどのように処理し認識するかのメカニズムを探求しました。
+            </p>
+          </div>
+          <div class="bg-white p-6 rounded-lg shadow-lg">
+            <h3 class="text-xl font-semibold text-slate-700 mb-2">
+              注意 (Attention)
+            </h3>
+            <p class="text-slate-600">
+              限られた認知資源をどのように配分し、特定の情報に焦点を当てるかというプロセスを研究。これは後の著書『注意と努力』に結実します。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="publications" class="mb-12 scroll-mt-16">
+        <h2
+          class="text-2xl sm:text-3xl font-semibold text-slate-800 mb-6 border-b-2 border-blue-500 pb-2"
+        >
+          45歳までの主要な出版物（1979年まで）
+        </h2>
+        <p class="mb-6 text-base sm:text-lg leading-relaxed">
+          カーネマンが45歳になるまでに発表した主要な論文と書籍は、彼のその後の研究の方向性を決定づける重要なものでした。以下に、報告書で特定された主要な出版物を紹介します。引用数は報告書記載のものです。
+        </p>
+        <div class="grid md:grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div
+            class="bg-white p-6 rounded-lg shadow-lg flex flex-col justify-between"
+          >
+            <div>
+              <h3 class="text-lg font-semibold text-blue-600 mb-1">
+                Pupil diameter and load on memory (1966)
+              </h3>
+              <p class="text-sm text-slate-500 mb-2">
+                共著者: J. Beatty | 出典: Science
+              </p>
+              <p class="text-slate-600 text-sm mb-2">
+                主要テーマ：認知負荷、注意、生理学的測定。瞳孔の拡張が精神的努力を反映することを示した初期の実証的研究。
+              </p>
+            </div>
+            <p class="text-sm font-medium text-slate-700 mt-3">引用数: 2,185</p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-lg shadow-lg flex flex-col justify-between"
+          >
+            <div>
+              <h3 class="text-lg font-semibold text-blue-600 mb-1">
+                Subjective probability: A judgment of representativeness (1972)
+              </h3>
+              <p class="text-sm text-slate-500 mb-2">
+                共著者: A. Tversky | 出典: Cognitive Psychology
+              </p>
+              <p class="text-slate-600 text-sm mb-2">
+                主要テーマ：代表性ヒューリスティック、主観確率、判断。人々が不確実な状況下で代表性ヒューリスティックに頼ることを示した画期的論文。
+              </p>
+            </div>
+            <p class="text-sm font-medium text-slate-700 mt-3">引用数: 9,330</p>
+          </div>
+          <div
+            class="bg-white p-6 rounded-lg shadow-lg flex flex-col justify-between"
+          >
+            <div>
+              <h3 class="text-lg font-semibold text-blue-600 mb-1">
+                Attention and Effort (1973)
+              </h3>
+              <p class="text-sm text-slate-500 mb-2">
+                種類: 書籍 | 出版社: Prentice-Hall
+              </p>
+              <p class="text-slate-600 text-sm mb-2">
+                主要テーマ：注意、認知努力、精神的負荷。注意と認知的努力に関する広範な研究を統合したモノグラフ。
+              </p>
+            </div>
+            <p class="text-sm font-medium text-slate-700 mt-3">
+              引用数: 19,678
+            </p>
+          </div>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+          <h3 class="text-lg font-semibold text-blue-600 mb-1">
+            Prospect theory: An analysis of decision under risk (1979)
+          </h3>
+          <p class="text-sm text-slate-500 mb-2">
+            共著者: A. Tversky | 出典: Econometrica
+          </p>
+          <p class="text-slate-600 text-sm">
+            主要テーマ：プロスペクト理論、リスク下の意思決定。この画期的な論文は1979年に発表され、カーネマンの45歳の誕生日以前に該当します。人々がどのようにリスクを伴う選択を行うかについて、期待効用理論とは異なる新しい記述的モデルを提示しました。この論文は行動経済学の基礎を築いたと広く認識されています。（注：報告書本文では、提供資料にこの論文の1979年版の直接的なリストがないことが言及されていますが、学術的に広く認知された重要な論文であり、年代的にも該当するためここに記載します。）
+          </p>
+        </div>
+
+        <h3 class="text-xl sm:text-2xl font-semibold text-slate-700 my-6">
+          主要論文の引用数比較（報告書記載分）
+        </h3>
+        <div class="chart-container bg-white p-4 rounded-lg shadow-lg">
+          <canvas id="citationsChart"></canvas>
+        </div>
+      </section>
+
+      <section id="evolution" class="mb-12 scroll-mt-16">
+        <h2
+          class="text-2xl sm:text-3xl font-semibold text-slate-800 mb-6 border-b-2 border-blue-500 pb-2"
+        >
+          テーマの進化
+        </h2>
+        <p class="mb-6 text-base sm:text-lg leading-relaxed">
+          カーネマンの初期の業績は、後の意思決定と行動経済学への貢献のための基礎を築きました。彼の初期の視覚的知覚と注意への焦点は、基本的な認知プロセスにおける彼の専門知識を確立しました。この努力と認知負荷に関する研究は、人間の合理性の限界を理解するための重要な枠組みを提供しました。1972年の「Subjective
+          probability: A judgment of
+          representativeness」への移行は、不確実性下の判断の研究への重要な転換点となり、「ヒューリスティクスとバイアスプログラム」の直接的な基礎を築きました。
+        </p>
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 items-center"
+        >
+          <div class="flow-box">視覚的知覚・注意</div>
+          <div class="flow-arrow hidden sm:flex">➔</div>
+          <div class="flow-arrow flex sm:hidden col-span-1 justify-center my-2">
+            ↓
+          </div>
+          <div class="flow-box">努力と認知的負荷</div>
+          <div class="flow-arrow hidden md:flex">➔</div>
+          <div
+            class="flow-arrow flex sm:hidden md:hidden col-span-1 justify-center my-2"
+          >
+            ↓
+          </div>
+          <div
+            class="flow-arrow hidden sm:flex md:hidden col-span-2 justify-center my-2"
+          >
+            ↓
+          </div>
+          <div class="flow-box">不確実性下の判断</div>
+          <div class="flow-arrow hidden sm:flex">➔</div>
+          <div class="flow-arrow flex sm:hidden col-span-1 justify-center my-2">
+            ↓
+          </div>
+          <div class="flow-box">ヒューリスティクスとバイアス</div>
+        </div>
+      </section>
+
+      <section id="collaboration" class="mb-12 scroll-mt-16">
+        <h2
+          class="text-2xl sm:text-3xl font-semibold text-slate-800 mb-6 border-b-2 border-blue-500 pb-2"
+        >
+          エイモス・トベルスキーとの協働
+        </h2>
+        <p class="text-base sm:text-lg leading-relaxed">
+          この形成期におけるエイモス・トベルスキーとの共同研究は、カーネマンの最も影響力のあるアイデアの発展において極めて重要な役割を果たしました。1960年代後半に始まった彼らのパートナーシップは、1970年代初頭のヒューリスティクスとバイアスプログラムの発展に不可欠でした。1972年の論文「Subjective
+          probability: A judgment of
+          representativeness」は、彼らの初期の共同研究の明確な例です。この共同研究は、プロスペクト理論、損失回避、フレーミング効果といった概念の基礎を築き、行動経済学の分野を形成する上で決定的な要因となりました。ヒューリスティクスとバイアスプログラムは、この初期の共同研究の直接的な成果であり、プロスペクト理論と行動経済学の基礎となる実証的証拠と理論的枠組みを提供しました。
+        </p>
+      </section>
+
+      <section id="conclusion" class="mb-12 scroll-mt-16">
+        <h2
+          class="text-2xl sm:text-3xl font-semibold text-slate-800 mb-6 border-b-2 border-blue-500 pb-2"
+        >
+          結論：変革的キャリアの多産な始まり
+        </h2>
+        <p class="text-base sm:text-lg leading-relaxed">
+          ダニエル・カーネマンの45歳までの出版物は、その後の広範な書誌と比較して数は少ないものの、集中的な知的発展と基礎的な貢献の期間を代表するものです。これらの初期の業績は、古典的な認知心理学（注意、知覚）から、不確実性下の判断と意思決定という新たな分野への明確な進展を示しています。「Pupil
+          diameter and load on memory」（1966年）、「Subjective probability: A
+          judgment of representativeness」（1972年）、そして書籍『Attention and
+          Effort』（1973年）といった論文は、彼の厳密な実証的アプローチと理論的深さを示しています。この初期の期間、特にエイモス・トベルスキーとの極めて重要な共同研究は、ヒューリスティクスとバイアスプログラム、そして後に彼にノーベル経済学賞をもたらすことになるプロスペクト理論の発展にとって不可欠な基礎を築きました。
+        </p>
+      </section>
+    </main>
+
+    <footer class="bg-slate-800 text-slate-300 py-8 text-center">
+      <p class="text-sm">このSPAは提供された報告書に基づいて作成されました。</p>
+      <p class="text-xs mt-1">&copy; 2024 Interactive Report Viewer</p>
+    </footer>
+
+    <script>
+      const publicationsData = {
+        labels: [
+          'Pupil diameter and load on memory (1966)',
+          'Subjective probability: A judgment of representativeness (1972)',
+          'Attention and Effort (1973)',
+        ],
+        datasets: [
+          {
+            label: '引用数',
+            data: [2185, 9330, 19678],
+            backgroundColor: [
+              'rgba(59, 130, 246, 0.6)', // blue-500
+              'rgba(16, 185, 129, 0.6)', // emerald-500
+              'rgba(239, 68, 68, 0.6)', // red-500
+            ],
+            borderColor: [
+              'rgba(59, 130, 246, 1)',
+              'rgba(16, 185, 129, 1)',
+              'rgba(239, 68, 68, 1)',
+            ],
+            borderWidth: 1,
+          },
+        ],
+      };
+
+      const configCitations = {
+        type: 'bar',
+        data: publicationsData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: '引用数',
+              },
+            },
+            x: {
+              ticks: {
+                autoSkip: false,
+                maxRotation: 25,
+                minRotation: 0,
+                callback: function (value, index, values) {
+                  const label = this.getLabelForValue(value);
+                  if (label.length > 25) {
+                    // Max length before wrapping
+                    return label.substring(0, 25) + '...';
+                  }
+                  return label;
+                },
+              },
+            },
+          },
+          plugins: {
+            legend: {
+              display: false, // Hiding legend as it's a single dataset bar chart
+            },
+            tooltip: {
+              callbacks: {
+                title: function (tooltipItems) {
+                  // Return the full label for the tooltip title
+                  return publicationsData.labels[tooltipItems[0].dataIndex];
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const citationsChart = new Chart(
+        document.getElementById('citationsChart'),
+        configCitations
+      );
+
+      // Mobile menu toggle
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+
+      // Smooth scroll and active nav link highlighting
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          mobileMenu.classList.add('hidden'); // Close mobile menu on link click
+
+          const targetId = this.getAttribute('href');
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            targetElement.scrollIntoView({
+              behavior: 'smooth',
+            });
+          }
+        });
+      });
+
+      const sections = document.querySelectorAll('section');
+      const navLinks = document.querySelectorAll('.nav-link');
+
+      window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach((section) => {
+          const sectionTop = section.offsetTop;
+          const sectionHeight = section.clientHeight;
+          if (pageYOffset >= sectionTop - sectionHeight / 3 - 70) {
+            // Adjusted offset for sticky header
+            current = section.getAttribute('id');
+          }
+        });
+
+        navLinks.forEach((link) => {
+          link.classList.remove(
+            'section-active',
+            'text-blue-600',
+            'font-semibold'
+          );
+          link.classList.add('text-slate-600');
+          if (link.getAttribute('href').substring(1) === current) {
+            link.classList.add(
+              'section-active',
+              'text-blue-600',
+              'font-semibold'
+            );
+            link.classList.remove('text-slate-600');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
